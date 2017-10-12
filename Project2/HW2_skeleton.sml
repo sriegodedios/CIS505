@@ -174,14 +174,29 @@ CommExec: Comm -> ProcEnv -> RunTimeState -> RunTimeState
 fun CommExec SkipC penv state = state
 |   CommExec (SeqC(cmd1,cmd2)) penv state =
       (*CommExec cmd1 penv state  (* *** MODIFY *)*)
+(*###########################################################*)
+
       (*Do the command one first before doing command 2*)
       let
         val state1 = CommExec cmd1 penv state
       in CommExec cmd2 penv state1
       end
+(*###########################################################*)
+
+(*###########################################################
+  First you evaluate the expression and check if it returns 0.
+  If it returns 0, you want to excute the "else" statement.
+  If it returns any other number, then you want to return the
+  "then" statement
+#################################################################*)
+
+
 |   CommExec (IfC(exp,cmd1,cmd2)) penv (state as (stos,_,_)) =
       CommExec cmd1 penv state *)(* *** MODIFY *)
 
+      if ExpEval exp stos = 0
+      then(CommExec cmd2 state)(*It's false excute the second command*)
+      else(CommExec cmd1 state) (*It's true excute the first command*)
 
 
 
