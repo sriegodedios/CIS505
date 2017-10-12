@@ -192,28 +192,38 @@ fun CommExec SkipC penv state = state
 
 
 |   CommExec (IfC(exp,cmd1,cmd2)) penv (state as (stos,_,_)) =
-      CommExec cmd1 penv state *)(* *** MODIFY *)
+      (*CommExec cmd1 penv state *)(* *** MODIFY *)
 
       if ExpEval exp stos = 0
-      then(CommExec cmd2 state)(*It's false excute the second command*)
-      else(CommExec cmd1 state) (*It's true excute the first command*)
+      then(CommExec cmd2 penv state)(*It's false excute the second command*)
+      else(CommExec cmd1 penv state) (*It's true excute the first command*)
 
 
 
 |   CommExec (WhileC(exp,cmd)) penv state =
-      CommExec cmd penv state*) (* *** MODIFY *)
-|   CommExec (AssignC(id,exp)) penv (stos, inp, outp) =
+  (*Creates a new command
+  Create an If c command
+  Recursively CommExec (command your creating) pnev state*)
+      CommE
+      (*CommExec cmd penv state*) (* *** MODIFY *)
+      if ExpVal exp sto = 0 (*Some how get it as a tuple*)
+      then(state)
+      else(CommExec smd penv state)
+
+
+
+(*|   CommExec (AssignC(id,exp)) penv (stos, inp, outp) =
       let val v = ExpEval exp stos
 
        in ((StosUpdate stos id), inp, outp) (* *** MODIFY *)
 
       end*)
- |   CommExec (OutputC exp) penv (stos,inp,outp) =
+|   CommExec (OutputC exp) penv (stos,inp,outp) =
       let val v = ExpEval exp stos
 
        in (stos, inp, (v::outp))   (* we eventually reverse the order *)
 
-      end*)
+      end
 |   CommExec (InputC id) penv (stos,inp,outp) =
 (*###########################################################*)
         ((StosUpdate id (hd inp) stos), (tl inp), outp)
@@ -229,7 +239,7 @@ fun CommExec SkipC penv state = state
 
           (* *** MODIFY *)
         in CommExec body penv (call_stores, inp, outp) (* *** MOFIFY *)
-      end*)
+      end
 |   CommExec (FunCallC (id,pid,exp)) penv
                 (stos as (global_sto,local_sto), inp, outp) =P
       let val v = ExpEval exp stos
@@ -239,7 +249,7 @@ fun CommExec SkipC penv state = state
                  CommExec body penv (call_stores, inp, outp)
         in (StosUpdate id 47 (* *** MODIFY *)
               (global_sto,local_sto), inp, outp)  (* *** MODIFY *)
-      end*)
+      end
 
 (* RUNNING THE PROGRAM *)
 
